@@ -1,0 +1,82 @@
+body {
+    font-size: 45px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    background-image: url('https://www.firestock.ru/download/s/ih0tz2gu8cpaux3/shutterstock_125515901.jpg?dl=0');
+}
+
+.main {
+    border: 2px solid black;
+    margin: 250px auto 0 auto;
+    width: 450px;
+    background: white;
+}
+
+.label {
+    border: 2px solid greenyellow;
+    padding: 15px;
+    text-align: center;
+}
+
+.add-task {
+    border: 2px solid blue;
+    display: flex;
+    justify-content: space-between;
+}
+
+.add-task__input {
+    margin: 5px;
+    padding: 10px;
+    width: 60%;
+}
+
+.add-task__button {
+    margin: 5px;
+    padding: 10px;
+    width: 40%;
+    margin-left: 0;
+}
+
+.action {
+    border: 2px solid green;
+    display: flex;
+    justify-content: space-between;
+}
+
+.action button {
+    padding: 10px;
+    margin: 5px;
+    width: 32%;
+}
+
+button {
+    font-size: 25px;
+    color: lightseagreen;
+    cursor: pointer;
+}
+
+.task-list__item {
+    padding: 10px;
+    border: 1px solid yellow;
+    font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.task-list {
+    margin:0;
+    padding: 0;
+    list-style: none;
+}
+
+.fa {
+    cursor: pointer;
+}
+
+li._completed{
+    text-decoration: line-through;
+    opacity: .5;
+}
+
+li._hide{
+    display: none;
+}
