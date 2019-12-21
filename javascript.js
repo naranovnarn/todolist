@@ -50,12 +50,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 copmleteCheckbox.addEventListener('change', completeTask);
 
                 taskList.appendChild(li);
-            })
+            });
         }
 
         function deleteTask(event) {
             const index = event.target.parentElement.getAttribute('data-index');
         }
+
+
+        
 
         function removeTasks()  {
             while (taskList.firstChild) {
