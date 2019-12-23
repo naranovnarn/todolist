@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         allTasks.addEventListener('click', renderAlltasks);
 
         function addTask() {
+
             if (input.value.trim() == '') {
                 return;
             }
@@ -38,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.code == 'Enter') {
                 addTask();
             }
+            
         }
 
         function render(tasks) {
@@ -71,24 +73,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function renderCompletedTasks(e) {
             deleteClassFocus();
-
-            
+            e.currentTarget.classList.add('focusButton');
 
             render(todoList.getCompleted());
             renderCountTasks();
-            e.target.classList.add('focusButton');
               
         }
 
         function renderActive(e) {
 
             deleteClassFocus();
-
-           
+            e.currentTarget.classList.add('focusButton');
 
             render(todoList.getActive());
             renderCountTasks();
-            e.target.classList.add('focusButton');
+         
 
         }
 
@@ -114,11 +113,11 @@ document.addEventListener('DOMContentLoaded', function () {
         function renderAlltasks(e) {
 
             deleteClassFocus();
+            e.currentTarget.classList.add('focusButton');
 
             render(todoList.getAll());
             renderCountTasks();
-            e.target.classList.add('focusButton');
-
+           
         }
 
         function changeStatusTask(event) {
@@ -144,10 +143,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         function deleteClassFocus() {
-
-            // console.log(actionButtons.children.length);
-
-            // console.log(actionButtons.children[1].className);
     
             for (let i = 0; i < actionButtons.children.length ; i++) {
 
