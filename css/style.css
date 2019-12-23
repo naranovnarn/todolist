@@ -80,3 +80,10 @@ li._completed{
 li._hide{
     display: none;
 }
+
+
+.focusButton {
+
+    border: 2px solid red;
+
+}

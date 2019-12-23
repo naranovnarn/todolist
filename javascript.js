@@ -9,18 +9,25 @@ document.addEventListener('DOMContentLoaded', function () {
         const completeButton = document.querySelector('.action__completed');
         const activeButton = document.querySelector('.action__active');
         const allTasks = document.querySelector('.action__alltasks');
+        const actionButtons = document.querySelector('.action');
+
         let id = 0;
 
 
         addButton.addEventListener('click', addTask);
         input.addEventListener('keydown', addEnter);
-        // completeButton.addEventListener('click', CompletedTasks)
+        completeButton.addEventListener('click', renderCompletedTasks);
+        activeButton.addEventListener('click', renderActive);
+        allTasks.addEventListener('click', renderAlltasks);
 
         function addTask() {
+            if (input.value.trim() == '') {
+                return;
+            }
             const taskName = input.value;
 
             todoList.add(taskName, id);
-            
+
             id++;
 
             render(todoList.getAll());
@@ -36,12 +43,16 @@ document.addEventListener('DOMContentLoaded', function () {
         function render(tasks) {
             removeTasks();
 
-            tasks.forEach((item) => {
+            tasks.forEach(item => {
                 const li = document.createElement('li');
 
                 li.classList.add('task-list__item');
                 li.setAttribute('data-index', item.id);
-                li.innerHTML = `<input type="checkbox" ${item.comleted ? "checked" : ''}> ${item.name} <i class="fa fa-trash-o delete-task"></i> `;
+                li.innerHTML = `<input type="checkbox" ${item.completed ? "checked" : ''}>${item.name}<i class="fa fa-trash-o delete-task"></i> `;
+
+                if (item.completed) {
+                    li.classList.add('_completed');
+                }
 
                 const iconDelete = li.lastElementChild;
                 const copmleteCheckbox = li.firstElementChild;
@@ -52,50 +63,109 @@ document.addEventListener('DOMContentLoaded', function () {
                 taskList.appendChild(li);
             });
 
+            renderCountTasks();
+
             resetInputValue();
         }
 
-        function renderCompletedTasks() {
+
+        function renderCompletedTasks(e) {
+            deleteClassFocus();
+
+            
+
             render(todoList.getCompleted());
+            renderCountTasks();
+            e.target.classList.add('focusButton');
+              
         }
 
-        function renderActive() {
+        function renderActive(e) {
+
+            deleteClassFocus();
+
+           
+
             render(todoList.getActive());
+            renderCountTasks();
+            e.target.classList.add('focusButton');
+
         }
 
         function deleteTask(event) {
+
             const id = +event.target.parentElement.getAttribute('data-index');
             todoList.remove(id);
             render(todoList.getAll());
+            renderCountTasks();
+
         }
 
         function resetInputValue() {
             input.value = '';
         }
 
-        function removeTasks()  {
+        function removeTasks() {
             while (taskList.firstChild) {
                 taskList.removeChild(taskList.firstChild);
             }
         }
 
+        function renderAlltasks(e) {
+
+            deleteClassFocus();
+
+            render(todoList.getAll());
+            renderCountTasks();
+            e.target.classList.add('focusButton');
+
+        }
+
         function changeStatusTask(event) {
             if (event.target.checked) {
-                // Найти по id таску, и поменять у нее свойство completed с false на true и наоборот.
                 const id = +event.target.parentElement.getAttribute('data-index');
-                console.log(id)
+                todoList.changeStatusOn(id);
+                renderCountTasks();
                 return this.parentElement.classList.add('_completed');
+                
             }
 
+            const id = +event.target.parentElement.getAttribute('data-index');
+            todoList.changeStatusOff(id);
             this.parentElement.classList.remove('_completed');
+            renderCountTasks();
         }
+
+        function renderCountTasks() {
+            allTasks.innerHTML = `<span>AllTasks:</span> <span>${todoList.getAll().length}</span>`;
+            activeButton.innerHTML = `<span>Active:</span> <span>${todoList.getActive().length}</span>`;
+            completeButton.innerHTML = `<span>Completed:</span> <span>${todoList.getCompleted().length}</span>`;
+        }
+
+
+        function deleteClassFocus() {
+
+            // console.log(actionButtons.children.length);
+
+            // console.log(actionButtons.children[1].className);
+    
+            for (let i = 0; i < actionButtons.children.length ; i++) {
+
+            actionButtons.children[i].classList.remove('focusButton');
+        
+            }
+
+        }
+
+
+
     }
 
 );
 
 function TodoList() {
     this.list = [];
-    
+
     this.add = function (name, id) {
         this.list.push({
             name: name,
@@ -123,6 +193,22 @@ function TodoList() {
     this.remove = function (id) {
         const indexDelete = this.list.findIndex(item => item.id == id);
         this.list.splice(indexDelete, 1);
+    }
+
+    this.changeStatusOn = function (id) {
+        this.list.forEach(item => {
+            if (item.id == id) {
+                item.completed = true;
+            }
+        })
+    }
+
+    this.changeStatusOff = function (id) {
+        this.list.forEach(item => {
+            if (item.id == id) {
+                item.completed = false;
+            }
+        })
     }
 }
 
