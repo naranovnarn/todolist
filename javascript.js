@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (input.value.trim() == '') {
                 return;
             }
+            
             const taskName = input.value;
 
             todoList.add(taskName, id);
@@ -32,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
             id++;
 
             render(todoList.getAll());
+            deleteClassFocus()
         }
-
 
         function addEnter(e) {
             if (e.code == 'Enter') {
@@ -66,18 +67,17 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             renderCountTasks();
-
             resetInputValue();
         }
 
 
         function renderCompletedTasks(e) {
+
             deleteClassFocus();
             e.currentTarget.classList.add('focusButton');
 
             render(todoList.getCompleted());
-            renderCountTasks();
-              
+            renderCountTasks();              
         }
 
         function renderActive(e) {
@@ -86,9 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.currentTarget.classList.add('focusButton');
 
             render(todoList.getActive());
-            renderCountTasks();
-         
-
+            renderCountTasks();   
         }
 
         function deleteTask(event) {
@@ -101,13 +99,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function resetInputValue() {
+
             input.value = '';
+
         }
 
         function removeTasks() {
+
             while (taskList.firstChild) {
                 taskList.removeChild(taskList.firstChild);
             }
+
         }
 
         function renderAlltasks(e) {
@@ -122,13 +124,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function changeStatusTask(event) {
             if (event.target.checked) {
+
                 const id = +event.target.parentElement.getAttribute('data-index');
                 todoList.changeStatusOn(id);
                 renderCountTasks();
                 return this.parentElement.classList.add('_completed');
                 
             }
-
             const id = +event.target.parentElement.getAttribute('data-index');
             todoList.changeStatusOff(id);
             this.parentElement.classList.remove('_completed');
@@ -149,11 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
             actionButtons.children[i].classList.remove('focusButton');
         
             }
-
         }
-
-
-
     }
 
 );
@@ -206,79 +204,3 @@ function TodoList() {
         })
     }
 }
-
-
-
-
-// deleteButton.addEventListener('click', deleteCompletedTask);
-
-// function deleteCompletedTask() {
-//     const allTasks = Array.from(document.querySelectorAll('li'));
-//     const completeTasks = allTasks.filter(item => item.className.includes('_completed'));
-//     const activeTasks = allTasks.filter(item => !item.className.includes('_completed'));
-
-//     completeTasks.forEach(item => item.classList.remove('_hide'));
-//     activeTasks.forEach(item => item.classList.add('_hide'));
-// }
-
-
-// activeButton.addEventListener('click', showActive);
-
-// function showActive() {
-//     const allTasks = Array.from(document.querySelectorAll('li'));
-//     const completeTasks = allTasks.filter(item => item.className.includes('_completed'));
-//     const activeTasks = allTasks.filter(item => !item.className.includes('_completed'));
-
-//     completeTasks.forEach(item => item.classList.add('_hide'));
-//     activeTasks.forEach(item => item.classList.remove('_hide'));
-// }
-
-
-// allTasks.addEventListener('click', showAllTasks);
-
-// function showAllTasks() {
-//     const allTasks = Array.from(document.querySelectorAll('li'));
-
-//     allTasks.forEach(item => item.classList.remove('_hide'));
-// }
-
-// if (input.value.trim() == '') {
-//     return;
-// }
-
-// const li = document.createElement('li');
-// li.innerHTML = `<input type="checkbox"> ${input.value} <i class="fa fa-trash-o delete-task"></i> `;
-// li.classList.add('task-list__item');
-// taskList.appendChild(li);
-
-
-// const iconDelete = li.lastElementChild;
-// iconDelete.addEventListener('click', deleteTask);
-
-// const copmleteCheckbox = li.firstElementChild;
-// copmleteCheckbox.addEventListener('change', completeTask);
-// // copmleteCheckbox.onchange = completeTask;
-// clearInput();
-
-// function clearInput() {
-//     input.value = '';
-// }
-
-// function deleteTask(e) {
-//     e.target.parentElement.remove();
-// }
-
-// input.addEventListener('keydown', addEnter);
-
-// function addEnter(e) {
-//     if (event.code == 'Enter') {
-//         addTask();
-//     }
-// }
-
-// function completeTask() {
-//     if (this.checked) {
-//         return this.parentElement.classList.add('_completed');
-//     }
-//     this.parentElement.classList.remove('_completed');
-// }
