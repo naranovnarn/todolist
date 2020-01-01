@@ -1,87 +1,87 @@
 body {
-    font-size: 45px;
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    background-image: url('https://images.unsplash.com/photo-1551523713-c1473aa01d9f?ixlib=rb-1.2.1&auto=format&fit=crop&w=701&q=80');
+  font-size: 45px;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  background-image: url("https://images.unsplash.com/photo-1551523713-c1473aa01d9f?ixlib=rb-1.2.1&auto=format&fit=crop&w=701&q=80");
 }
 
 .main {
-    border: 2px solid black;
-    margin: 250px auto 0 auto;
-    width: 450px;
-    background: white;
+  border: 2px solid black;
+  margin: 250px auto 0 auto;
+  width: 450px;
+  background: white;
 }
 
 .label {
-    border: 2px solid greenyellow;
-    padding: 15px;
-    text-align: center;
+  border: 2px solid greenyellow;
+  padding: 15px;
+  text-align: center;
 }
 
 .add-task {
-    border: 2px solid blue;
-    display: flex;
-    justify-content: space-between;
+  border: 2px solid blue;
+  display: flex;
+  justify-content: space-between;
 }
 
 .add-task__input {
-    margin: 5px;
-    padding: 10px;
-    width: 60%;
+  margin: 5px;
+  padding: 10px;
+  width: 60%;
 }
 
 .add-task__button {
-    margin: 5px;
-    padding: 10px;
-    width: 40%;
-    margin-left: 0;
+  margin: 5px;
+  padding: 10px;
+  width: 40%;
+  margin-left: 0;
 }
 
 .action {
-    border: 2px solid green;
-    display: flex;
-    justify-content: space-between;
+  border: 2px solid green;
+  display: flex;
+  justify-content: space-between;
 }
 
 .action button {
-    padding: 10px;
-    margin: 5px;
-    width: 32%;
+  padding: 10px;
+  margin: 5px;
+  width: 32%;
 }
 
 button {
-    font-size: 25px;
-    color: lightseagreen;
-    cursor: pointer;
+  font-size: 25px;
+  color: lightseagreen;
+  cursor: pointer;
 }
 
 .task-list__item {
-    padding: 10px;
-    border: 1px solid yellow;
-    font-size: 15px;
-    display: flex;
-    justify-content: space-between;
+  padding: 10px;
+  border: 1px solid yellow;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .task-list {
-    margin:0;
-    padding: 0;
-    list-style: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .fa {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-li._completed{
-    text-decoration: line-through;
-    opacity: .5;
+li._completed {
+  text-decoration: line-through;
+  opacity: 0.5;
 }
 
-li._hide{
-    display: none;
+.hide {
+  /* visibility: hidden; */
+  display: none;
 }
-
 
 .focusButton {
-    border: 2px solid red;
+  border: 2px solid red;
 }
