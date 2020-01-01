@@ -46,11 +46,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
       li.classList.add("task-list__item");
       li.setAttribute("data-index", item.id);
-      li.innerHTML = `<input type="checkbox" ${
-        item.completed ? "checked" : ""
-      }><span>${
-        item.name
-      }</span><input type="text" class="hide"><button class="hide">save</button><i class="fa fa-trash-o delete-task"></i> `;
+      li.innerHTML = `
+        <input type="checkbox" ${item.completed ? "checked" : ""}>
+        <span>${item.name}</span>
+        <input type="text" class="hide">
+        <button class="hide">save</button>
+        <i class="fa fa-trash-o delete-task"></i>
+      `;
 
       if (item.completed) {
         li.classList.add("_completed");
