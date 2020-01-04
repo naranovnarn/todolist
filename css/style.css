@@ -1,18 +1,27 @@
 body {
   font-size: 45px;
   font-family: Georgia, "Times New Roman", Times, serif;
-  background-image: url("https://images.unsplash.com/photo-1551523713-c1473aa01d9f?ixlib=rb-1.2.1&auto=format&fit=crop&w=701&q=80");
+  background-image: url("../123123.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
 
 .main {
   border: 2px solid black;
-  margin: 250px auto 0 auto;
   width: 450px;
   background: white;
 }
 
 .label {
-  border: 2px solid greenyellow;
   padding: 15px;
   text-align: center;
 }

@@ -1,6 +1,32 @@
 document.addEventListener("DOMContentLoaded", function() {
   const todoList = new TodoList();
 
+  const url = "http://localhost:3000/tasks";
+
+  const httpMethods = {
+    GET: "GET",
+    POST: "POST",
+    PUT: "PUT",
+    DELETE: "DELETE"
+  };
+
+  fetch(`${url}`, {
+    method: httpMethods.PUT,
+    body: JSON.stringify({
+      name: "Получать данные с сервера GETTTTTTTT",
+      id: "2",
+      completed: "true"
+    }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+    .then(result => console.log(result))
+    .catch(error => {
+      console.error(error, "1 error");
+      return error;
+    });
+
   const addButton = document.querySelector(".add-task__button");
   const taskList = document.querySelector(".task-list");
   const input = document.querySelector(".add-task__input");
@@ -16,6 +42,8 @@ document.addEventListener("DOMContentLoaded", function() {
   completeButton.addEventListener("click", renderCompletedTasks);
   activeButton.addEventListener("click", renderActive);
   allTasks.addEventListener("click", renderAlltasks);
+
+  render(todoList.getAll());
 
   function addTask() {
     if (input.value.trim() == "") {
@@ -46,12 +74,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
       li.classList.add("task-list__item");
       li.setAttribute("data-index", item.id);
-      li.innerHTML = `
-        <input type="checkbox" ${item.completed ? "checked" : ""}>
-        <span>${item.name}</span>
-        <input type="text" class="hide">
-        <button class="hide">save</button>
-        <i class="fa fa-trash-o delete-task"></i>
+      li.innerHTML = `<input type="checkbox" ${
+        item.completed ? "checked" : ""
+      }><span>${
+        item.name
+      }</span><input type="text" class="hide"><button class="hide">save</button><i class="fa fa-trash-o delete-task"></i>
       `;
 
       if (item.completed) {
@@ -76,27 +103,35 @@ document.addEventListener("DOMContentLoaded", function() {
     resetInputValue();
   }
 
+  // TODO: refactor me (без е)
   function renderCompletedTasks(e) {
     deleteClassFocus();
     e.currentTarget.classList.add("focusButton");
 
     render(todoList.getCompleted());
-    renderCountTasks();
   }
 
+  // TODO: refactor me (без е)
   function renderActive(e) {
     deleteClassFocus();
     e.currentTarget.classList.add("focusButton");
 
     render(todoList.getActive());
-    renderCountTasks();
+  }
+
+  // TODO: refactor me
+  function renderAlltasks(e) {
+    deleteClassFocus();
+    e.currentTarget.classList.add("focusButton");
+
+    render(todoList.getAll());
   }
 
   function deleteTask(event) {
     const id = +event.target.parentElement.getAttribute("data-index");
+
     todoList.remove(id);
     render(todoList.getAll());
-    renderCountTasks();
   }
 
   function resetInputValue() {
@@ -104,30 +139,25 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function removeTasks() {
+    // TODO: без while
     while (taskList.firstChild) {
       taskList.removeChild(taskList.firstChild);
     }
   }
 
-  function renderAlltasks(e) {
-    deleteClassFocus();
-    e.currentTarget.classList.add("focusButton");
-
-    render(todoList.getAll());
-    renderCountTasks();
-  }
-
   function changeStatusTask(event) {
+    // TODO: убрать дублирование кода
     if (event.target.checked) {
       const id = +event.target.parentElement.getAttribute("data-index");
-      todoList.changeStatusOn(id);
-      renderCountTasks();
-      return this.parentElement.classList.add("_completed");
+      todoList.changeStatus(id, true);
+      render(todoList.getAll());
+
+      return;
     }
+
     const id = +event.target.parentElement.getAttribute("data-index");
-    todoList.changeStatusOff(id);
-    this.parentElement.classList.remove("_completed");
-    renderCountTasks();
+    todoList.changeStatus(id, false);
+    render(todoList.getAll());
   }
 
   function renderCountTasks() {
@@ -143,11 +173,13 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function deleteClassFocus() {
+    // TODO: без for
     for (let i = 0; i < actionButtons.children.length; i++) {
       actionButtons.children[i].classList.remove("focusButton");
     }
   }
 
+  // TODO: refactor me
   function editTask(e) {
     e.target.classList.add("hide");
     e.currentTarget.nextSibling.classList.remove("hide");
@@ -159,20 +191,19 @@ document.addEventListener("DOMContentLoaded", function() {
     const id = +e.target.parentElement.getAttribute("data-index");
     const newName = e.currentTarget.previousSibling.value;
     todoList.changeTaskName(id, newName);
+
     render(todoList.getAll());
-    renderCountTasks();
   }
 });
 
+// TODO: переделать на Class
 function TodoList() {
-  this.list = [];
+  this.list = JSON.parse(localStorage.getItem("todoList")) || [];
 
   this.add = function(name, id) {
-    this.list.push({
-      name: name,
-      completed: false,
-      id: id
-    });
+    this.list.push({ name: name, completed: false, id: id });
+
+    this.saveTaskToLocalStorage();
   };
 
   this.getAll = function() {
@@ -194,22 +225,18 @@ function TodoList() {
   this.remove = function(id) {
     const indexDelete = this.list.findIndex(item => item.id == id);
     this.list.splice(indexDelete, 1);
+
+    this.saveTaskToLocalStorage();
   };
 
-  this.changeStatusOn = function(id) {
+  this.changeStatus = function(id, boolean) {
     this.list.forEach(item => {
       if (item.id == id) {
-        item.completed = true;
+        item.completed = boolean;
       }
     });
-  };
 
-  this.changeStatusOff = function(id) {
-    this.list.forEach(item => {
-      if (item.id == id) {
-        item.completed = false;
-      }
-    });
+    this.saveTaskToLocalStorage();
   };
 
   this.changeTaskName = function(id, newName) {
@@ -218,5 +245,12 @@ function TodoList() {
         item.name = newName;
       }
     });
+    this.saveTaskToLocalStorage();
   };
+
+  this.saveTaskToLocalStorage = function() {
+    localStorage.setItem("todoList", JSON.stringify(this.getAll()));
+  };
+
+  // this.removeFromLocalStorage = function(id) {};
 }

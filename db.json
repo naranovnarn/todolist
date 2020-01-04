@@ -1,0 +1,29 @@
+{
+  "tasks": [
+    {
+      "name": "Поправить тудушки",
+      "id": "1",
+      "completed": "false"
+    },
+    {
+      "name": "Получать данные с сервера GETTTTTTTT",
+      "id": "2",
+      "completed": "true"
+    },
+    {
+      "name": "Отправлять данные на сервер POST",
+      "id": "3",
+      "completed": "false"
+    },
+    {
+      "name": "Редактировать данные на сервере PUT",
+      "id": "4",
+      "completed": "false"
+    },
+    {
+      "name": "Удалять данные на сервере DELETE",
+      "id": "4",
+      "completed": "false"
+    }
+  ]
+}
