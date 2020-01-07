@@ -1,87 +1,116 @@
 document.addEventListener("DOMContentLoaded", function() {
-  const todoList = new TodoList();
-
   const url = "http://localhost:3000/tasks";
 
-  const httpMethods = {
-    GET: "GET",
-    POST: "POST",
-    PUT: "PUT",
-    DELETE: "DELETE"
-  };
-
-  fetch(`${url}`, {
-    method: httpMethods.PUT,
-    body: JSON.stringify({
-      name: "Получать данные с сервера GETTTTTTTT",
-      id: "2",
-      completed: "true"
-    }),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-    .then(result => console.log(result))
-    .catch(error => {
-      console.error(error, "1 error");
-      return error;
-    });
-
   const addButton = document.querySelector(".add-task__button");
-  const taskList = document.querySelector(".task-list");
   const input = document.querySelector(".add-task__input");
-  const completeButton = document.querySelector(".action__completed");
-  const activeButton = document.querySelector(".action__active");
-  const allTasks = document.querySelector(".action__alltasks");
-  const actionButtons = document.querySelector(".action");
 
-  let id = 0;
+  const actionButtons = document.querySelector(".action");
+  const allTasks = document.querySelector(".action__alltasks");
+  const activeButton = document.querySelector(".action__active");
+  const completeButton = document.querySelector(".action__completed");
+
+  const taskList = document.querySelector(".task-list");
+
+  let id = 10;
 
   addButton.addEventListener("click", addTask);
   input.addEventListener("keydown", addEnter);
   completeButton.addEventListener("click", renderCompletedTasks);
-  activeButton.addEventListener("click", renderActive);
-  allTasks.addEventListener("click", renderAlltasks);
+  activeButton.addEventListener("click", renderActiveTasks);
+  allTasks.addEventListener("click", renderAllTasks);
 
-  render(todoList.getAll());
+  renderAllTasks();
+
+  function renderAllTasks(e) {
+    fetch(url)
+      .then(response => response.json())
+      .then(allTasks => {
+        render(allTasks);
+      });
+    deleteClassFocus();
+    e ? e.currentTarget.classList.add("focusButton") : "";
+  }
+
+  function renderActiveTasks(e) {
+    const url = "http://localhost:3000/tasks?completed=false";
+
+    fetch(url)
+      .then(response => response.json())
+      .then(activeTasks => {
+        render(activeTasks);
+      });
+
+    deleteClassFocus();
+    e.currentTarget.classList.add("focusButton");
+  }
+
+  function renderCompletedTasks(e) {
+    const url = "http://localhost:3000/tasks?completed=true";
+
+    fetch(url)
+      .then(response => response.json())
+      .then(completedTasks => {
+        render(completedTasks);
+      });
+
+    deleteClassFocus();
+    e.currentTarget.classList.add("focusButton");
+  }
 
   function addTask() {
-    if (input.value.trim() == "") {
+    if (input.value.trim() === "") {
       return;
     }
 
     const taskName = input.value;
-
-    todoList.add(taskName, id);
+    const newTask = {
+      name: taskName,
+      id: `${id}`,
+      completed: "false"
+    };
 
     id++;
 
-    render(todoList.getAll());
-    deleteClassFocus();
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8"
+      },
+      body: JSON.stringify(newTask)
+    }).then(() => {
+      fetch(url)
+        .then(response => response.json())
+        .then(allTasks => {
+          render(allTasks);
+          console.log(allTasks);
+        });
+    });
+
+    resetInputValue();
+    renderCountTasks();
   }
 
   function addEnter(e) {
-    if (e.code == "Enter") {
+    if (e.code === "Enter") {
       addTask();
     }
   }
 
   function render(tasks) {
     removeTasks();
-
     tasks.forEach(item => {
       const li = document.createElement("li");
 
       li.classList.add("task-list__item");
       li.setAttribute("data-index", item.id);
       li.innerHTML = `<input type="checkbox" ${
-        item.completed ? "checked" : ""
+        item.completed === "true" ? "checked" : ""
       }><span>${
         item.name
       }</span><input type="text" class="hide"><button class="hide">save</button><i class="fa fa-trash-o delete-task"></i>
       `;
 
-      if (item.completed) {
+      if (item.completed === "true") {
         li.classList.add("_completed");
       }
 
@@ -103,35 +132,21 @@ document.addEventListener("DOMContentLoaded", function() {
     resetInputValue();
   }
 
-  // TODO: refactor me (без е)
-  function renderCompletedTasks(e) {
-    deleteClassFocus();
-    e.currentTarget.classList.add("focusButton");
-
-    render(todoList.getCompleted());
-  }
-
-  // TODO: refactor me (без е)
-  function renderActive(e) {
-    deleteClassFocus();
-    e.currentTarget.classList.add("focusButton");
-
-    render(todoList.getActive());
-  }
-
-  // TODO: refactor me
-  function renderAlltasks(e) {
-    deleteClassFocus();
-    e.currentTarget.classList.add("focusButton");
-
-    render(todoList.getAll());
-  }
-
   function deleteTask(event) {
     const id = +event.target.parentElement.getAttribute("data-index");
 
-    todoList.remove(id);
-    render(todoList.getAll());
+    fetch(`${url}/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8"
+      }
+    }).then(() => {
+      fetch(url)
+        .then(response => response.json())
+        .then(allTasks => {
+          render(allTasks);
+        });
+    });
   }
 
   function resetInputValue() {
@@ -146,30 +161,32 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function changeStatusTask(event) {
-    // TODO: убрать дублирование кода
-    if (event.target.checked) {
-      const id = +event.target.parentElement.getAttribute("data-index");
-      todoList.changeStatus(id, true);
-      render(todoList.getAll());
-
-      return;
-    }
-
     const id = +event.target.parentElement.getAttribute("data-index");
-    todoList.changeStatus(id, false);
-    render(todoList.getAll());
+
+    if (!event.target.checked) {
+      fetch(`${url}/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8"
+        }
+        // body: JSON.stringify(newTask)
+      });
+      debugger;
+    }
   }
 
   function renderCountTasks() {
-    allTasks.innerHTML = `<span>AllTasks:</span> <span>${
-      todoList.getAll().length
-    }</span>`;
-    activeButton.innerHTML = `<span>Active:</span> <span>${
-      todoList.getActive().length
-    }</span>`;
-    completeButton.innerHTML = `<span>Completed:</span> <span>${
-      todoList.getCompleted().length
-    }</span>`;
+    fetch(url)
+      .then(response => response.json())
+      .then(result => {
+        allTasks.innerHTML = `<span>AllTasks:</span> <span>${result.length}</span>`;
+        activeButton.innerHTML = `<span>Active:</span> <span>${
+          result.filter(item => item.completed === "false").length
+        }</span>`;
+        completeButton.innerHTML = `<span>Completed:</span> <span>${
+          result.filter(item => item.completed === "true").length
+        }</span>`;
+      });
   }
 
   function deleteClassFocus() {
@@ -195,62 +212,3 @@ document.addEventListener("DOMContentLoaded", function() {
     render(todoList.getAll());
   }
 });
-
-// TODO: переделать на Class
-function TodoList() {
-  this.list = JSON.parse(localStorage.getItem("todoList")) || [];
-
-  this.add = function(name, id) {
-    this.list.push({ name: name, completed: false, id: id });
-
-    this.saveTaskToLocalStorage();
-  };
-
-  this.getAll = function() {
-    return this.list;
-  };
-
-  this.getActive = function() {
-    const activeTasks = this.list.filter(item => !item.completed);
-
-    return activeTasks;
-  };
-
-  this.getCompleted = function() {
-    const completedTasks = this.list.filter(item => item.completed);
-
-    return completedTasks;
-  };
-
-  this.remove = function(id) {
-    const indexDelete = this.list.findIndex(item => item.id == id);
-    this.list.splice(indexDelete, 1);
-
-    this.saveTaskToLocalStorage();
-  };
-
-  this.changeStatus = function(id, boolean) {
-    this.list.forEach(item => {
-      if (item.id == id) {
-        item.completed = boolean;
-      }
-    });
-
-    this.saveTaskToLocalStorage();
-  };
-
-  this.changeTaskName = function(id, newName) {
-    this.list.forEach(item => {
-      if (item.id == id) {
-        item.name = newName;
-      }
-    });
-    this.saveTaskToLocalStorage();
-  };
-
-  this.saveTaskToLocalStorage = function() {
-    localStorage.setItem("todoList", JSON.stringify(this.getAll()));
-  };
-
-  // this.removeFromLocalStorage = function(id) {};
-}
