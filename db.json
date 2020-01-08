@@ -26,14 +26,9 @@
       "completed": "false"
     },
     {
-      "name": "отображение ошибки сервера",
+      "name": "ошибки сервера алерт",
       "id": "9",
       "completed": "false"
-    },
-    {
-      "name": "1\\2",
-      "id": "10",
-      "completed": "true"
     }
   ]
 }

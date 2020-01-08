@@ -113,16 +113,41 @@ document.addEventListener("DOMContentLoaded", function () {
                 li.classList.add("_completed");
             }
 
-            const iconDelete = li.lastElementChild;
-            const completeCheckbox = li.firstElementChild;
-            const taskName = li.firstElementChild.nextSibling;
-            const taskNameNew = taskName.nextSibling;
-            const saveNewNameTask = taskNameNew.nextSibling;
+            li.addEventListener("click", function(e) {
+                const target = e.target;
+                if (target.tagName === "I") {
+                    deleteTask(target);
+                    return;
+                }
+                if (target.tagName === "BUTTON") {
+                const input = target.parentNode.querySelector("input[type='text']");
+                const name = input.value; // тут косяк
 
-            iconDelete.addEventListener("click", deleteTask);
-            completeCheckbox.addEventListener("change", changeStatusTask);
-            taskName.addEventListener("dblclick", editTask);
-            saveNewNameTask.addEventListener("click", saveNewTask);
+                debugger
+
+                    saveNewTask(target, name);
+                    return;
+                }
+
+            });
+
+            li.addEventListener("dblclick", function (e) {
+                const target = e.target;
+                const input = target.parentNode.querySelector(".hide");
+                const button = target.parentNode.querySelector("BUTTON");
+                if (target.tagName === "SPAN") {
+                    editTask(target, input, button);
+                }
+            })
+
+            li.addEventListener("change", function (e) {
+                const target = e.target;
+                const name = target.parentNode.querySelector("span").innerText;
+                if (target.tagName === "INPUT") {
+                    changeStatusTask(target, name)
+                }
+
+            });
 
             taskList.appendChild(li);
         });
@@ -132,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function deleteTask(event) {
-        const id = +event.target.parentElement.getAttribute("data-index");
+        const id = +event.parentElement.getAttribute("data-index");
 
         fetch(`${url}/${id}`, {
             method: "DELETE",
@@ -159,9 +184,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function changeStatusTask(e) {
-        const id = +e.target.parentElement.getAttribute("data-index");
-        const name = e.currentTarget.nextSibling.textContent;
+    function changeStatusTask(target, name) {
+        const id = +target.parentElement.getAttribute("data-index");
         const newTask = {
             name: name,
             id: id,
@@ -206,23 +230,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // TODO: refactor me
-    function editTask(e) {
-        e.target.classList.add("hide");
-        e.currentTarget.nextSibling.classList.remove("hide");
-        e.currentTarget.nextSibling.nextSibling.classList.remove("hide");
-        e.currentTarget.nextSibling.value = event.target.innerHTML;
-
+    function editTask(target, input, button) {
+        target.classList.add("hide");
+        input.classList.remove("hide");
+        button.classList.remove("hide");
+        input.value = target.innerHTML;
     }
 
-    function saveNewTask(e) {
-
-        const id = +e.target.parentElement.getAttribute("data-index");
-        const name = e.currentTarget.previousSibling.value;
+    function saveNewTask(target, name) {
+        const id = +target.parentElement.getAttribute("data-index");
+        debugger
 
         const newTask = {
             name: name,
             id: id,
-            completed: `${e.target.parentElement.children[0].checked}`
+            completed: `${target.parentElement.children[0].checked}`
         };
 
         fetch(`${url}/${id}`, {
