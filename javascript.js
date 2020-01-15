@@ -3,15 +3,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const addButton = document.querySelector(".add-task__button");
     const input = document.querySelector(".add-task__input");
-
     const actionButtons = document.querySelector(".action");
     const allTasks = document.querySelector(".action__alltasks");
     const activeButton = document.querySelector(".action__active");
     const completeButton = document.querySelector(".action__completed");
-
     const taskList = document.querySelector(".task-list");
 
-    let id = 10;
+
+
+
 
     addButton.addEventListener("click", addTask);
     input.addEventListener("keydown", addEnter);
@@ -25,10 +25,11 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch(url)
             .then(response => response.json())
             .then(allTasks => {
-                render(allTasks);
-            });
+                render(allTasks)
+            })
+            .catch(() => alert('Ошибка сервера'))
         deleteClassFocus();
-        e ? e.currentTarget.classList.add("focusButton") : "";
+        e ? e.currentTarget.classList.add("focusButton") : ""
     }
 
     function renderActiveTasks(e) {
@@ -38,7 +39,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(activeTasks => {
                 render(activeTasks);
-            });
+            })
+            .catch(() => alert('Ошибка сервера'));
 
         deleteClassFocus();
         e.currentTarget.classList.add("focusButton");
@@ -51,41 +53,52 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(completedTasks => {
                 render(completedTasks);
-            });
+            })
+            .catch(() => alert('Ошибка сервера'));
 
         deleteClassFocus();
         e.currentTarget.classList.add("focusButton");
     }
 
-    function addTask() {
+    function addTask(e) {
+        e.preventDefault();
+
         if (input.value.trim() === "") {
             return;
         }
 
-        const taskName = input.value;
-        const newTask = {
-            name: taskName,
-            id: `${id}`,
-            completed: "false"
-        };
-
-        id++;
-
-        fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            body: JSON.stringify(newTask)
-        }).then(() => {
-            fetch(url)
-                .then(response => response.json())
-                .then(allTasks => {
-                    render(allTasks);
-                });
-        });
-
-        resetInputValue();
+        fetch(url)
+            .then(response => response.json())
+            .then(allTasks => {
+                let id = allTasks.length
+                const taskName = input.value;
+                const newTask = {
+                    name: taskName,
+                    id: `${id+1}`,
+                    completed: "false"
+                }
+                console.log(id);
+                return newTask;
+            })
+            .then((newTask) => {
+                fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json;charset=utf-8"
+                        },
+                        body: JSON.stringify(newTask)
+                    })
+                    .then(() => {
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(allTasks => {
+                                render(allTasks);
+                            })
+                    })
+            })
+            .catch(() => {
+                console.log('add task')
+            })
     }
 
     function addEnter(e) {
@@ -104,8 +117,8 @@ document.addEventListener("DOMContentLoaded", function () {
             li.innerHTML = `
 <input type="checkbox" ${item.completed === "true" ? "checked" : ""}>
 <span>${item.name}</span>
-<input type="text" class="hide">
-<button class="hide">save</button>
+<input type="text" class="hide" id="inputtt">
+<button class="hide" id="buttonnn">save</button>
 <i class="fa fa-trash-o delete-task"></i>
       `;
 
@@ -113,23 +126,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 li.classList.add("_completed");
             }
 
-            li.addEventListener("click", function(e) {
+            li.addEventListener("click", function (e) {
                 const target = e.target;
                 if (target.tagName === "I") {
                     deleteTask(target);
                     return;
                 }
+            })
+
+
+            li.addEventListener("click", function (e) {
+                const target = e.target;
                 if (target.tagName === "BUTTON") {
-                const input = target.parentNode.querySelector("input[type='text']");
-                const name = input.value; // тут косяк
-
-                debugger
-
+                    name = e.target.previousElementSibling.value;
+                    debugger;
                     saveNewTask(target, name);
                     return;
                 }
 
-            });
+            })
 
             li.addEventListener("dblclick", function (e) {
                 const target = e.target;
@@ -160,17 +175,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const id = +event.parentElement.getAttribute("data-index");
 
         fetch(`${url}/${id}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            }
-        }).then(() => {
-            fetch(url)
-                .then(response => response.json())
-                .then(allTasks => {
-                    render(allTasks);
-                });
-        });
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json;charset=utf-8"
+                }
+            }).then(() => {
+                fetch(url)
+                    .then(response => response.json())
+                    .then(allTasks => {
+                        render(allTasks);
+                    });
+            })
+            .catch(() => alert('Ошибка сервера'));
     }
 
     function resetInputValue() {
@@ -178,7 +194,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function removeTasks() {
-        // TODO: без while
         while (taskList.firstChild) {
             taskList.removeChild(taskList.firstChild);
         }
@@ -193,19 +208,20 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         fetch(`${url}/${id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            body: JSON.stringify(newTask)
-        })
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json;charset=utf-8"
+                },
+                body: JSON.stringify(newTask)
+            })
             .then(() => {
                 fetch(url)
                     .then(response => response.json())
                     .then(allTasks => {
                         render(allTasks);
                     });
-            });
+            })
+            .catch(() => alert('Ошибка сервера'));
     }
 
     function renderCountTasks() {
@@ -219,7 +235,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 completeButton.innerHTML = `<span>Completed:</span> <span>${
                     result.filter(item => item.completed === "true").length
                     }</span>`;
-            });
+            })
+            .catch(() => console.log('ASD'));
     }
 
     function deleteClassFocus() {
@@ -229,7 +246,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // TODO: refactor me
     function editTask(target, input, button) {
         target.classList.add("hide");
         input.classList.remove("hide");
@@ -237,29 +253,30 @@ document.addEventListener("DOMContentLoaded", function () {
         input.value = target.innerHTML;
     }
 
-    function saveNewTask(target, name) {
+    function saveNewTask(target, newName) {
         const id = +target.parentElement.getAttribute("data-index");
         debugger
 
         const newTask = {
-            name: name,
+            name: newName,
             id: id,
             completed: `${target.parentElement.children[0].checked}`
         };
 
         fetch(`${url}/${id}`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            body: JSON.stringify(newTask)
-        })
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json;charset=utf-8"
+                },
+                body: JSON.stringify(newTask)
+            })
             .then(() => {
                 fetch(url)
                     .then(response => response.json())
                     .then(allTasks => {
                         render(allTasks);
                     });
-            });
+            })
+            .catch(() => alert('Ошибка сервера'));
     }
 });

@@ -39,7 +39,7 @@ input {
 }
 
 .main {
-  width: 60%;
+  width: 40%;
   background: #fff;
   border-radius: 16px;
   padding: 16px;
@@ -127,4 +127,12 @@ li._completed {
 
 .focusButton {
   border: 2px solid red;
+}
+
+#buttonnn {
+  background-color: gray;
+}
+
+#inputtt {
+  background-color: hotpink;
 }
